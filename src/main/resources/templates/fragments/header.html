@@ -1,0 +1,14 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <body>
+    <div th:fragment="header">
+      <span>Logged in as: <strong th:text="${username != null ? username : #httpServletRequest.remoteUser}">user</strong></span>
+
+      <!-- POST logout form with CSRF token -->
+      <form th:action="@{/logout}" method="post" style="display:inline; margin-left: 1rem;">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        <button type="submit">Logout</button>
+      </form>
+    </div>
+  </body>
+</html>

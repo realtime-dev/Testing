@@ -1,0 +1,81 @@
+:root {
+  --brand: #2d6cdf;
+  --card-bg: rgba(255,255,255,0.95);
+}
+
+/* Full-page background uses your image with a dark overlay for contrast */
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #222;
+}
+
+body {
+  background-image:
+    linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)),
+    url('/images/machala-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+.login-page {
+  padding: 2rem;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  border: none;
+  border-radius: 12px;
+  background: var(--card-bg);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+  overflow: hidden;
+}
+
+.card-title {
+  color: var(--brand);
+  font-weight: 700;
+  font-size: 1.6rem;
+  margin-bottom: 0;
+}
+
+input.form-control:focus {
+  box-shadow: 0 0 0 0.1rem rgba(45,108,223,0.15);
+  border-color: var(--brand);
+}
+
+.btn-primary {
+  background-color: var(--brand);
+  border-color: var(--brand);
+}
+
+.btn-toggle {
+  border: 1px solid #e9ecef;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+}
+
+.btn-toggle svg { color: #495057; }
+.btn-toggle.active svg { color: var(--brand); }
+
+@media (max-width: 576px) {
+  .login-card { margin: 0 1rem; }
+  .login-page { padding: 1.25rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body { background-attachment: scroll; }
+}
