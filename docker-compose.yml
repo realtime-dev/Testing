@@ -1,0 +1,16 @@
+version: "3.8"
+services:
+  auth-app:
+    build: .
+    image: auth-demo:latest
+    ports:
+      - "8080:8080"
+    environment:
+      # Example env vars you might add, e.g. for production DB
+      # SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/authdb
+      # SPRING_DATASOURCE_USERNAME: user
+      # SPRING_DATASOURCE_PASSWORD: pass
+    restart: unless-stopped
+    # uncomment to persist maven cache between builds (for faster rebuilds)
+    # volumes:
+    #   - ~/.m2:/root/.m2
