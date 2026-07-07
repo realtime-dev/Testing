@@ -6,7 +6,7 @@
 </head>
 <body>
   <!-- include header fragment; controller adds "username" attribute -->
-  <div th:replace="fragments/header :: header"></div>
+  <div th:replace="~{fragments/header :: header}"></div>
 
   <h1>Dashboard</h1>
   <p>Welcome, <span th:text="${username != null ? username : #httpServletRequest.remoteUser}">user</span>!</p>

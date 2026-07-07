@@ -1,5 +1,7 @@
 package com.example.authdemo.config;
 
+import com.example.authdemo.security.CustomAuthFailureHandler;
+import com.example.authdemo.security.CustomAuthenticationProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -17,7 +19,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @Configuration
 public class SecurityConfig {
 
-    // Primary in-memory user: username=kappa, password=TEST2 (dev only)
     @Bean
     @Primary
     public InMemoryUserDetailsManager userDetailsService(PasswordEncoder passwordEncoder) {
@@ -33,36 +34,44 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // Force AuthenticationManager to use the in-memory userDetailsService + encoder
+    // Keep authenticationManager if you use it elsewhere
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http,
                                                        PasswordEncoder passwordEncoder,
                                                        InMemoryUserDetailsManager userDetailsService) throws Exception {
         AuthenticationManagerBuilder authBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
+        // Keep the userDetailsService for the provider to use
         authBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
         return authBuilder.build();
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http,
+                                           InMemoryUserDetailsManager userDetailsService,
+                                           PasswordEncoder passwordEncoder) throws Exception {
+
+        // Register the custom authentication provider that enforces only 'kappa' allowed
+        http.authenticationProvider(new CustomAuthenticationProvider(userDetailsService, passwordEncoder));
+
         http
           .authorizeHttpRequests(auth -> auth
               .requestMatchers(
                   new AntPathRequestMatcher("/register"),
                   new AntPathRequestMatcher("/login"),
                   new AntPathRequestMatcher("/css/**"),
+                  new AntPathRequestMatcher("/js/**"),
+                  new AntPathRequestMatcher("/images/**"),
                   new AntPathRequestMatcher("/h2-console/**")
               ).permitAll()
               .anyRequest().authenticated()
           )
           .formLogin(form -> form
               .loginPage("/login")
-              .failureUrl("/login?error")          // explicit failure URL
+              .failureHandler(new CustomAuthFailureHandler("/login?error"))
               .defaultSuccessUrl("/dashboard", true)
               .permitAll()
           )
           .logout(logout -> logout
-              // default expects POST to /logout with CSRF token
               .logoutUrl("/logout")
               .logoutSuccessUrl("/login?logout")
               .permitAll()

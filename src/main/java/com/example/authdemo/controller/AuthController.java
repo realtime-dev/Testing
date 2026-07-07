@@ -1,31 +1,38 @@
 package com.example.authdemo.controller;
 
-import com.example.authdemo.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class AuthController {
-    private final UserService userService;
-    public AuthController(UserService userService) { this.userService = userService; }
 
     @GetMapping("/login")
-    public String login() { return "login"; }
+    public String login(HttpServletRequest request,
+                        Model model,
+                        @RequestParam(required = false) String logout,
+                        @RequestParam(required = false) String registered) {
 
-    @GetMapping("/register")
-    public String registerForm() { return "register"; }
-
-    @PostMapping("/register")
-    public String register(@RequestParam String username, @RequestParam String password, Model model) {
-        try {
-            userService.registerNewUser(username, password);
-            return "redirect:/login?registered";
-        } catch (IllegalArgumentException e) {
-            model.addAttribute("error", e.getMessage());
-            return "register";
+        // Pull any failure message and attempted username from the session (set by failure handler)
+        Object loginError = request.getSession().getAttribute("LOGIN_ERROR_MESSAGE");
+        if (loginError != null) {
+            model.addAttribute("loginError", loginError.toString());
+            request.getSession().removeAttribute("LOGIN_ERROR_MESSAGE");
         }
+
+        Object attempted = request.getSession().getAttribute("LOGIN_ATTEMPTED_USERNAME");
+        if (attempted != null) {
+            model.addAttribute("lastUsername", attempted.toString());
+            request.getSession().removeAttribute("LOGIN_ATTEMPTED_USERNAME");
+        }
+
+        if (logout != null) model.addAttribute("logoutParam", true);
+        if (registered != null) model.addAttribute("registered", true);
+
+        return "login";
     }
 
     @GetMapping("/dashboard")
